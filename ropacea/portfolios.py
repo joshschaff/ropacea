@@ -21,7 +21,7 @@ class Portfolio:
     """Percentage holdings of each ticker in ropacea.data.UNIVERSE"""
 
     def __init__(self, holdings) -> None:
-        assert len(holdings) == UNIVERSE
+        assert len(holdings) == len(UNIVERSE)
         assert sum(holdings) == 1
         self.holdings = holdings
 
@@ -137,11 +137,13 @@ def _min_risk_portfolio(mark_date: date,
             # TODO: calculate covariance matrix using sample covariance
             pass
 
-    # TODO: find a way to get min return or switch min risk model to use gamma instead
-    min_return = 0
+    # TODO: is this a good min_return?
+    min_return = expected_returns.mean()
     holdings = _min_risk_model(expected_returns, covariance, min_return)
 
     return Portfolio(holdings)
 
     
 
+if __name__ == '__main__':
+    print(_equally_weighted_portfolio())
