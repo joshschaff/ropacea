@@ -1,3 +1,10 @@
+"""Utility functions to read data provided by Dr. Ma.
+
+Also defines the universe of tickers we are using for the rest of analysis.
+    >>> from ropacea.data import UNIVERSE
+"""
+
+
 import os
 import pandas as pd
 from pathlib import Path
