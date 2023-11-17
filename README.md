@@ -13,3 +13,12 @@ Append any new Python package dependencies to the `dependencies` list in `pyproj
 
 
 Hello this is a new change!
+
+
+
+## structure
+
+ - whenever we are running our model is the mark_dt 
+ - We will have one piece of code that subsets the historical data before the mark_dt
+    - this will bea a subset of the market_return.xlsx
+ - this subset, likely as a pandas dataframe, will be the input to each of our 3 covariance estimation methods
