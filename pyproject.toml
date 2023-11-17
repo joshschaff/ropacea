@@ -2,7 +2,9 @@
 name = "ropacea"
 version = "0.0.1"
 dependencies = [
-    'pandas'
+    'pandas',
+    'openpyxl',
+    'python-dateutil'
 ]
 description = "Risk-Optimized Portfolios: An Analysis of Covariance Estimation Approaches"
 
