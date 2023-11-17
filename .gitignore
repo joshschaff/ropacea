@@ -1,0 +1,7 @@
+# python stuff
+*.egg-info/
+*__pycache__/
+.venv/*
+pyvenv.cfg
+
+
