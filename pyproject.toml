@@ -1,7 +1,9 @@
 [project]
 name = "ropacea"
 version = "0.0.1"
-dependencies = []
+dependencies = [
+    'pandas'
+]
 description = "Risk-Optimized Portfolios: An Analysis of Covariance Estimation Approaches"
 
 
