@@ -1,12 +1,6 @@
 """ Contains all 5 different portfolio strategies.
 
-To calculate a portfolio, call calculate_portfolio() with a mark_date and strategy:
-    >>> from datetime import date
-    >>> from ropacea.portfolios import PortfolioStrategy, calculate_portfolio()
-    >>> mark_date = date(2022, 11, 17)
-    >>> strategy = PortfolioStrategy.SINGLE_FACTOR
-    >>> my_portfolio = calculate_portfolio(mark_date, strategy)
-
+See calculate_portfolio() for how to use.
 """
 
 
@@ -21,13 +15,17 @@ from ropacea.data import UNIVERSE, get_in_sample_data
 
 
 class Portfolio:
+    """Wrapper class for a portfolio of holdings"""
+
     holdings: list
+    """Percentage holdings of each ticker in ropacea.data.UNIVERSE"""
 
     def __init__(self, holdings) -> None:
         assert len(holdings) == UNIVERSE
+        assert sum(holdings) == 1
         self.holdings = holdings
 
-    def total_return(self, returns) -> float:
+    def portfolio_return(self, returns) -> float:
         """Value the portfolio at a given set of returns"""
         return sum([r*h for r,h in zip(returns, self.holdings)])
 
@@ -43,28 +41,38 @@ class PortfolioStrategy(Enum):
 
 
 def calculate_portfolio(mark_date: date, strategy: PortfolioStrategy) -> Portfolio:
+    """
+    Calculate a portfolio on the given mark_date and using the given strategy.
+
+    Sample usage:
+        >>> from datetime import date
+        >>> from ropacea.portfolios import PortfolioStrategy, calculate_portfolio()
+        >>> mark_date = date(2022, 11, 17)
+        >>> strategy = PortfolioStrategy.SINGLE_FACTOR
+        >>> my_portfolio = calculate_portfolio(mark_date, strategy)
+    """
     portfolio = None
 
     match strategy:
         case PortfolioStrategy.VALUE_WEGHTED:
-            portfolio = value_weighted_portfolio(mark_date)
+            portfolio = _value_weighted_portfolio(mark_date)
         case PortfolioStrategy.EQUALLY_WEIGHTED:
-            portfolio = equally_weighted_portfolio()
+            portfolio = _equally_weighted_portfolio()
         case PortfolioStrategy.CONSTANT_CORRELATION | \
              PortfolioStrategy.SINGLE_FACTOR | \
              PortfolioStrategy.SAMPLE_COVARIANCE:
-            portfolio = min_risk_portfolio(mark_date, strategy)
+            portfolio = _min_risk_portfolio(mark_date, strategy)
         case _:
-            raise ValueError("Invald PortfolioStrategy specified")
+            raise ValueError("Invalid PortfolioStrategy specified")
 
     return portfolio
 
 
-def value_weighted_portfolio(mark_date) -> Portfolio:
+def _value_weighted_portfolio(mark_date) -> Portfolio:
     # TODO
     pass
 
-def equally_weighted_portfolio() -> Portfolio:
+def _equally_weighted_portfolio() -> Portfolio:
     N = len(UNIVERSE)
     holdings = [1/N] * N
     return Portfolio(holdings)
@@ -103,7 +111,7 @@ def _min_risk_model(expected_returns: np.ndarray,
     return holdings.X
 
 
-def min_risk_portfolio(mark_date: date, 
+def _min_risk_portfolio(mark_date: date, 
                        strategy: PortfolioStrategy) -> Portfolio:
     """Calculate a portfolio using the min risk model and 
     one of the three covariance estimation strategies"""
