@@ -4,7 +4,9 @@ version = "0.0.1"
 dependencies = [
     'pandas',
     'openpyxl',
-    'python-dateutil'
+    'python-dateutil',
+    'gurobipy',
+    'numpy'
 ]
 description = "Risk-Optimized Portfolios: An Analysis of Covariance Estimation Approaches"
 
