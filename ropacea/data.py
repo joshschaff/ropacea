@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from pathlib import Path
+from functools import cache
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
@@ -43,7 +44,7 @@ UNIVERSE= [
     'BAC'
 ]
 
-
+@cache
 def read_monthly_return_capitalization() -> pd.DataFrame:
     """
     Returns monthly-return-capitalization filtered to the stock universe.
@@ -60,7 +61,7 @@ def read_monthly_return_capitalization() -> pd.DataFrame:
     return mrc
 
 
-def get_in_sample_data(mark_date: date, sample_months: int) ->  pd.DataFrame:
+def get_in_sample_data(mark_date: date, sample_months: int = 60) ->  pd.DataFrame:
     """
     Return monthly-return-capitalization filtered to include only those date within sample_months 
     back in time of the given mark_date.
