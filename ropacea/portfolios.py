@@ -13,6 +13,7 @@ from gurobipy import GRB
 import numpy as np
 
 from ropacea.data import UNIVERSE, get_in_sample_data
+from ropacea.Single_factor import single_factor
 
 
 class Portfolio:
@@ -99,13 +100,13 @@ def _min_risk_model(expected_returns: np.ndarray,
     )
 
     # set objective to minimize risk
-    model.setObjective(holdings @ covariance @ holdings, GRB.MINIMZE)
+    model.setObjective(holdings @ covariance @ holdings, GRB.MINIMIZE)
 
     # fully invested constraint
     model.addConstr(sum([x for x in holdings]) == 1)
 
     # minimum return constraint
-    model.addCosntr(expected_returns.T @ holdings >= min_return)
+    model.addConstr(expected_returns.T @ holdings >= min_return)
 
     model.optimize()
 
@@ -123,14 +124,13 @@ def _min_risk_portfolio(mark_date: date,
     expected_returns = data.groupby('Ticker')['Monthly Total Return'].mean()
     # convert from pandas series to numpy array
     expected_returns = np.array(
-        expected_returns[ticker] for ticker in UNIVERSE
+        [expected_returns[ticker] for ticker in UNIVERSE]
     )
 
     covariance = None
     match strategy:
         case PortfolioStrategy.SINGLE_FACTOR:
-            # TODO: calculate covariance matrix for single factor
-            pass
+            covariance = single_factor(data)
         case PortfolioStrategy.CONSTANT_CORRELATION:
             # TODO: calculate covariance matrix for constant correlation
             pass
