@@ -75,8 +75,7 @@ def single_factor(data):
     column_omega = regression_results['Omega'].to_numpy()
 
     # Creating a diagonal matrix from omega and square it
-    squared_column = np.square(column_omega)
-    D = np.diag(squared_column)
+    D = np.diag(column_omega)
 
     # Displaying the resulting diagonal matrix
 
