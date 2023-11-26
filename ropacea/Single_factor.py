@@ -38,7 +38,7 @@ print(stdM)
 data = pd.merge(data, mkt, on='Month', how='left')
 
 # Creating an empty DataFrame to store regression results
-regression_results = pd.DataFrame(columns=['Ticker', 'Theta', 'Beta'])
+regression_results = pd.DataFrame(columns=['Ticker', 'Alpha', 'Beta', 'Epsilon'])
 
 # Grouping by 'Group' column
 grouped = data.groupby('Ticker')
@@ -57,13 +57,16 @@ for group, group_df in grouped:
     beta = model.params['rM']
     epsilon = model.resid
 
-    # Appending results to the DataFrame
-    regression_results = regression_results.append({
-        'Ticker': group,
-        'Alpha': alpha,
-        'Beta': beta,
-        'Epsilon': epsilon,
-    }, ignore_index=True)
+    # Create a new DataFrame with the new data
+    new_data = pd.DataFrame({
+        'Ticker': [group],
+        'Alpha': [alpha],
+        'Beta': [beta],
+        'Epsilon': [epsilon]
+    })
+
+    # Concatenate the new data with the existing DataFrame
+    regression_results = pd.concat([regression_results, new_data], ignore_index=True)
 
 # Displaying the results
 print(regression_results)
@@ -76,10 +79,10 @@ column_epsilon = regression_results['Epsilon'].to_numpy()
 # Creating a diagonal matrix from omega and square it
 squared_column = np.square(column_epsilon)
 D = np.diag(squared_column)
-print(column_epsilon)
-print(squared_column)
+#print(column_epsilon)
+#print(squared_column)
 
 # Displaying the resulting diagonal matrix
 
 V = stdM**2 * np.dot(B, B.T) + D
-print(V)
+#print(V)
