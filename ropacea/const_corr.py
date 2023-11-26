@@ -23,6 +23,7 @@ pivot_data = data_copy.pivot(index='Monthly Calendar Date', columns='Ticker', va
 
 # Calculate the correlation matrix
 rho = pivot_data.corr()
+print("rho")
 print(rho)
 
  # Construct Covariance Matrix using Constant Correlation Model
