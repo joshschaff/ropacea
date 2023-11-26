@@ -23,13 +23,13 @@ def single_factor(data):
     mkt.columns = ['Month', 'rM']
 
     # Displaying the resulting DataFrame
-    print(mkt)
+    # print(mkt)
 
     #Find std of market
-    stdM = data['Monthly Total Return'].std()
+    stdM = mkt['rM'].std()
 
     # Displaying the resulting DataFrame
-    print(stdM)
+    # print(stdM)
 
     # Merging the two DataFrames based on the 'Number' column
     data = pd.merge(data, mkt, on='Month', how='left')
@@ -67,7 +67,7 @@ def single_factor(data):
         regression_results = pd.concat([regression_results, new_data], ignore_index=True)
 
     # Displaying the results
-    print(regression_results)
+    # print(regression_results)
 
     # Extracting the column as a NumPy array
     B = regression_results['Beta'].to_numpy()
@@ -75,13 +75,12 @@ def single_factor(data):
     column_omega = regression_results['Omega'].to_numpy()
 
     # Creating a diagonal matrix from omega and square it
-    squared_column = np.square(column_omega)
-    D = np.diag(squared_column)
+    D = np.diag(column_omega)
 
     # Displaying the resulting diagonal matrix
 
     V = stdM**2 * np.dot(B, B.T) + D
-    print(V)
+    # print(V)
 
     return V
 
