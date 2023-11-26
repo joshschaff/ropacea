@@ -1,4 +1,10 @@
 # Single factor
+
+import pandas as pd
+from datetime import date
+import statsmodels.api as sm
+import numpy as np
+
 mark_date = date(year = 2017, month=1, day=1)
 sample_months = 60
 data = get_in_sample_data(mark_date, sample_months)
@@ -30,10 +36,10 @@ print(stdM)
 # Merging the two DataFrames based on the 'Number' column
 data = pd.merge(data, mkt, on='Month', how='left')
 
-import statsmodels.api as sm
+
 
 # Creating an empty DataFrame to store regression results
-regression_results = pd.DataFrame(columns=['Ticker', 'Alpha', 'Beta'])
+regression_results = pd.DataFrame(columns=['Ticker', 'Theta', 'Beta'])
 
 # Grouping by 'Group' column
 grouped = data.groupby('Ticker')
@@ -48,20 +54,18 @@ for group, group_df in grouped:
     model = sm.OLS(y, X).fit()
 
     # Extracting coefficients
-    alpha = model.params['const']
+    theta = model.params['const']
     beta = model.params['rM']
 
     # Appending results to the DataFrame
     regression_results = regression_results.append({
         'Ticker': group,
-        'Alpha': alpha,
+        'Theta': theta,
         'Beta': beta,
     }, ignore_index=True)
 
 # Displaying the results
 print(regression_results)
-
-import numpy as np
 
 # Extracting the column as a NumPy array
 B = regression_results['Beta'].to_numpy()
