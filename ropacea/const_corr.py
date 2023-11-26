@@ -3,7 +3,7 @@ import data
 import numpy as np
 import pandas as pd
 
-def constant_corr(import_data):
+def const_corr(import_data):
 
 
     data_copy = import_data
@@ -37,7 +37,7 @@ def constant_corr(import_data):
     # print("Constant Correlation Covariance Matrix:")
     # print(V_df)
 
-    return V_df
+    return V
 
     # import openpyxl
 
@@ -51,6 +51,6 @@ if __name__ == '__main__':
     mark_date = date(year = 2017, month=1, day=1)
     sample_months = 60
     data = data.get_in_sample_data(mark_date, sample_months)
-    out = constant_corr(data)
+    out = const_corr(data)
 
     print(out)
