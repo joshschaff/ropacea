@@ -37,12 +37,18 @@ def backtest_loop(start_date: date,
     mark_date = start_date
     backtest_results = []
 
+    total_return = 1.00
+
     while (mark_date < end_date):
         print(f"{mark_date = }")
         backtest_result = backtest(mark_date, strategy, frequency)
         backtest_results.append(backtest_result)
+        total_return *= (1+backtest_result.portfolio.portfolio_return(backtest_result.returns) )
 
         mark_date = mark_date + frequency
+
+
+    print(f"{total_return = }")
 
     return backtest_results
 
@@ -52,5 +58,5 @@ if __name__ == '__main__':
     out = backtest_loop(
         start_date = date(year = 2017, month=1, day=1),
         end_date = date(2023, month=1, day=1),
-        strategy=PortfolioStrategy.SINGLE_FACTOR
+        strategy=PortfolioStrategy.SAMPLE_COVARIANCE
     )
