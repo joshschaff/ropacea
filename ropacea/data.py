@@ -8,7 +8,6 @@ Also defines the universe of tickers we are using for the rest of analysis.
 import os
 import pandas as pd
 from pathlib import Path
-from functools import cache
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
@@ -51,7 +50,7 @@ UNIVERSE= [
     'XOM'
 ]
 
-@cache
+
 def read_monthly_return_capitalization() -> pd.DataFrame:
     """
     Returns monthly-return-capitalization filtered to the stock universe.
