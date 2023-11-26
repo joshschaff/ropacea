@@ -7,9 +7,11 @@ import pandas as pd
 mark_date = date(year = 2017, month=1, day=1)
 sample_months = 60
 data_copy = data.get_in_sample_data(mark_date, sample_months)
+data_sub = data_copy.groupby('Ticker')['Monthly Total Return']
+
 
 #sample covariance matrix
-cov = np.cov(data_copy)
+cov = np.cov(data_sub)
 
 # Number of assets (variables)
 n_assets = cov.shape[0]
@@ -24,7 +26,7 @@ np.fill_diagonal(target_cov_matrix, np.diag(cov))
 # Estimate the optimal shrinkage coefficient (Ledoit-Wolf method)
 delta = np.mean(np.diag(cov - target_cov_matrix))
 gamma = np.linalg.norm(cov - target_cov_matrix, ord='fro') ** 2
-n_obs = data_copy.shape[0]  #number of observations in the data set
+n_obs = data_copy["Monthly Calendar Date"].n_unique() #number of observations in the data set
 
 alpha = max(0, (gamma - n_assets) / (delta * n_obs))
 
