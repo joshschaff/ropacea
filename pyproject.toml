@@ -6,7 +6,8 @@ dependencies = [
     'openpyxl',
     'python-dateutil',
     'gurobipy',
-    'numpy'
+    'numpy',
+    'statsmodels'
 ]
 description = "Risk-Optimized Portfolios: An Analysis of Covariance Estimation Approaches"
 
