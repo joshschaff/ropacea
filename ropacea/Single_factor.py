@@ -26,7 +26,7 @@ def single_factor(data):
     print(mkt)
 
     #Find std of market
-    stdM = data['Monthly Total Return'].std()
+    stdM = mkt['rM'].std()
 
     # Displaying the resulting DataFrame
     print(stdM)
