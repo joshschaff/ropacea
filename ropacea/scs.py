@@ -34,5 +34,7 @@ def scs(data):
     # Calculate the shrunken covariance matrix
     shrunken_cov_matrix = alpha * target_cov_matrix + (1 - alpha) * sample_cov_matrix
 
-    print("Shrunken Covariance Matrix:")
-    print(shrunken_cov_matrix.values)
+    # print("Shrunken Covariance Matrix:")
+    # print(shrunken_cov_matrix.values)
+
+    return shrunken_cov_matrix.values

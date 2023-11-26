@@ -58,5 +58,5 @@ if __name__ == '__main__':
     out = backtest_loop(
         start_date = date(year = 2017, month=1, day=1),
         end_date = date(2023, month=1, day=1),
-        strategy=PortfolioStrategy.SAMPLE_COVARIANCE
+        strategy=PortfolioStrategy.CONSTANT_CORRELATION
     )
