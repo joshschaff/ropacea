@@ -28,6 +28,7 @@ np.fill_diagonal(target_cov_matrix, np.diag(cov))
 delta = np.mean(np.diag(cov - target_cov_matrix))
 gamma = np.linalg.norm(cov - target_cov_matrix, ord='fro') ** 2
 n_obs = np.unique(data_copy["Monthly Calendar Date"]) #number of observations in the data set
+n_obs = len(n_obs)
 
 alpha = max(0, (gamma - n_assets) / (delta * n_obs))
 
