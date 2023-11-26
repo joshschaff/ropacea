@@ -28,7 +28,7 @@ np.fill_diagonal(target_cov_matrix, np.diag(sample_cov_matrix))
 # Estimate the optimal shrinkage coefficient (Ledoit-Wolf method)
 delta = np.mean(np.diag(sample_cov_matrix - target_cov_matrix))
 gamma = np.linalg.norm(sample_cov_matrix - target_cov_matrix, ord='fro') ** 2
-n_obs = len(pivot_data)  # Number of unique dates (observations)
+n_obs = data_copy['Monthly Calendar Date'].nunique()  # Number of unique dates (observations)
 
 alpha = max(0, (gamma - n_assets) / (delta * n_obs))
 
