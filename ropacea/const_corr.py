@@ -3,7 +3,7 @@ import data
 import numpy as np
 import pandas as pd
 
-mark_date = date(year = 2016, month=1, day=1)
+mark_date = date(year = 2017, month=1, day=1)
 sample_months = 60
 
 data_copy = data.get_in_sample_data(mark_date, sample_months)
@@ -31,3 +31,10 @@ V_df = pd.DataFrame(V, index=rho.index, columns=rho.columns)
 
 print("Constant Correlation Covariance Matrix:")
 print(V_df)
+
+import openpyxl
+
+excel_file_path = '/Users/kathrynjarjoura/Desktop/V_cc.xlsx'
+
+# Export the DataFrame to Excel
+V_df.to_excel(excel_file_path, index=True)
