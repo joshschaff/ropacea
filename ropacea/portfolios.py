@@ -14,6 +14,8 @@ import numpy as np
 
 from ropacea.data import UNIVERSE, get_in_sample_data
 from ropacea.Single_factor import single_factor
+from ropacea.const_corr import constant_corr
+from ropacea.scs import scs
 
 
 class Portfolio:
@@ -132,11 +134,9 @@ def _min_risk_portfolio(mark_date: date,
         case PortfolioStrategy.SINGLE_FACTOR:
             covariance = single_factor(data)
         case PortfolioStrategy.CONSTANT_CORRELATION:
-            # TODO: calculate covariance matrix for constant correlation
-            pass
+            covariance = constant_corr(data)
         case PortfolioStrategy.SAMPLE_COVARIANCE:
-            # TODO: calculate covariance matrix using sample covariance
-            pass
+            covariance = scs(data)
 
     # TODO: is this a good min_return?
     min_return = expected_returns.mean()
