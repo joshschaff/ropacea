@@ -6,6 +6,7 @@ See calculate_portfolio() for how to use.
 
 from datetime import date
 from enum import Enum
+from collections import defaultdict
 
 import gurobipy as gp
 from gurobipy import GRB
@@ -22,7 +23,7 @@ class Portfolio:
 
     def __init__(self, holdings) -> None:
         assert len(holdings) == len(UNIVERSE)
-        assert sum(holdings) == 1
+        assert abs(sum(holdings)-1) < 1e-6
         self.holdings = holdings
 
     def portfolio_return(self, returns) -> float:

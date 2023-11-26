@@ -58,7 +58,8 @@ def read_monthly_return_capitalization() -> pd.DataFrame:
 
     Also drops duplicate values
     """
-    mrc = pd.read_excel(DATA_DIR / 'monthly-return-capitalization.xlsx')
+    #mrc = pd.read_excel(DATA_DIR / 'monthly-return-capitalization.xlsx')
+    mrc = pd.read_csv(DATA_DIR / 'monthly-return-capitalization.csv', parse_dates=[3])
     #parse_dates=[4]) # parse the 'Monthly Calendar Date' col as date
     mrc = mrc[mrc['Ticker'].isin(UNIVERSE)]
 
@@ -66,6 +67,24 @@ def read_monthly_return_capitalization() -> pd.DataFrame:
     mrc = mrc.drop_duplicates(subset=['Ticker', 'Monthly Calendar Date'], keep='first')
 
     return mrc
+
+
+def subset_monthly_return_capitalization(start_date: date, end_date: date):
+    """ Obtain a subset of monthly return capitalization from start_date (inclusive) to end_date (exclusive)
+    Dates are rounded down to the start of the month.
+    """
+    start_date = start_date.replace(day=1)
+    end_date = end_date.replace(day=1)
+
+    # fetch all monthly return capitalizations
+    mrc = read_monthly_return_capitalization()
+
+    # filter
+    mrc = mrc[mrc['Monthly Calendar Date'] < pd.to_datetime(end_date)]
+    mrc = mrc[mrc['Monthly Calendar Date'] >= pd.to_datetime(start_date)]
+    
+    return mrc
+
 
 
 def get_in_sample_data(mark_date: date, sample_months: int = 60) ->  pd.DataFrame:
@@ -83,18 +102,11 @@ def get_in_sample_data(mark_date: date, sample_months: int = 60) ->  pd.DataFram
         >>> sample_data = get_in_sample_data(mark_date, sample_months)
     """
 
-    # round down to start of the month
-    mark_date = mark_date.replace(day=1)
-
-    # fetch all monthly return capitalizations
-    mrc = read_monthly_return_capitalization()
-
-    # filter to before mark_date
-    mrc = mrc[mrc['Monthly Calendar Date'] < pd.to_datetime(mark_date)]
-
     # filter to after start of sample period
     start_date = mark_date - relativedelta(months=sample_months)
-    mrc =  mrc[mrc['Monthly Calendar Date'] >= pd.to_datetime(start_date)]
+
+    # fetch all monthly return capitalizations
+    mrc = subset_monthly_return_capitalization(start_date, mark_date)
 
     # validate data
     ticker_counts = mrc.groupby('Ticker')['Monthly Calendar Date'].count()
@@ -105,6 +117,23 @@ def get_in_sample_data(mark_date: date, sample_months: int = 60) ->  pd.DataFram
                   f"for {ticker:4} at {mark_date}")
 
     return mrc
+
+
+def get_returns(start_date, end_date):
+    """Get the return rate for each ticker in UNIVERSE over the given period.
+
+    Arguments:
+        state_date: inclusive
+        end_date: exclusive
+    """
+    out_of_sample_data = subset_monthly_return_capitalization(start_date, end_date)
+
+    # series with Tickers as indices and total returns as values
+    returns = out_of_sample_data.groupby('Ticker')['Monthly Total Return'].prod()
+    # order by UNIVERSE
+    returns = [returns.get(ticker, 0.0) for ticker in UNIVERSE]
+
+    return returns
 
 
 # test functionality
