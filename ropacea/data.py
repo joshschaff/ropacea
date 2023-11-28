@@ -118,7 +118,7 @@ def get_in_sample_data(mark_date: date, sample_months: int = 60) ->  pd.DataFram
     return mrc
 
 
-def get_returns(start_date, end_date):
+def get_market_returns(start_date, end_date):
     """Get the return rate for each ticker in UNIVERSE over the given period.
 
     Arguments:

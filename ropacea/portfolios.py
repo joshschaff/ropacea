@@ -29,7 +29,7 @@ class Portfolio:
         assert abs(sum(holdings)-1) < 1e-6
         self.holdings = holdings
 
-    def portfolio_return(self, returns) -> float:
+    def calc_portfolio_return(self, returns) -> float:
         """Value the portfolio at a given set of returns"""
         return sum([r*h for r,h in zip(returns, self.holdings)])
 

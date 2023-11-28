@@ -1,15 +1,21 @@
 from dataclasses import dataclass
 from datetime import date
 from dateutil.relativedelta import relativedelta
+import statistics
+import math
 
 from ropacea.portfolios import Portfolio, PortfolioStrategy, calculate_portfolio
-from ropacea.data import get_returns
+from ropacea.data import get_market_returns
+
+
+BASIS_POINT = 0.0001
 
 @dataclass
 class BacktestResult():
     mark_date: date
     portfolio: Portfolio
-    returns: list[float]
+    market_returns: list[float]
+    portfolio_return: float
 
 
 def backtest(mark_date: date,
@@ -17,15 +23,16 @@ def backtest(mark_date: date,
              frequency: relativedelta) -> BacktestResult:
 
     portfolio = calculate_portfolio(mark_date, strategy)
-    returns = get_returns(mark_date, mark_date+frequency)
+    market_returns = get_market_returns(mark_date, mark_date+frequency)
 
-    portfolio_return = portfolio.portfolio_return(returns)
-    print(f"{portfolio_return = }")
+    monthly_portfolio_return = portfolio.calc_portfolio_return(market_returns)
+    print(f"{monthly_portfolio_return = }")
 
     return BacktestResult(
         mark_date,
         portfolio,
-        returns
+        market_returns,
+        monthly_portfolio_return
     )
 
 
@@ -37,26 +44,61 @@ def backtest_loop(start_date: date,
     mark_date = start_date
     backtest_results = []
 
-    total_return = 1.00
-
     while (mark_date < end_date):
         print(f"{mark_date = }")
         backtest_result = backtest(mark_date, strategy, frequency)
         backtest_results.append(backtest_result)
-        total_return *= (1+backtest_result.portfolio.portfolio_return(backtest_result.returns) )
 
         mark_date = mark_date + frequency
-
-
-    print(f"{total_return = }")
 
     return backtest_results
 
 
+def summarize_results(backtest_results: list[BacktestResult]):
+
+    print(f"{'='*10} SUMMARY {'='*10}")
+
+    # monhtly returns (bp)
+    monthly_returns_bp_mean = sum([
+      br.portfolio_return/BASIS_POINT for br in backtest_results  
+    ]) / len(backtest_results)
+
+    monthly_returns_bp_std = statistics.stdev([
+      br.portfolio_return/BASIS_POINT for br in backtest_results  
+    ])
+
+    print(f"{monthly_returns_bp_mean = :>.2f}")
+    print(f"{monthly_returns_bp_std = :>.2f}")
+
+    # annualized mean
+    annualized_mean_pct = (
+        (1+ monthly_returns_bp_mean * BASIS_POINT) ** 12 - 1
+    ) * 100
+    # annualized STD
+    annualized_std_pct = (
+        (monthly_returns_bp_std * BASIS_POINT) * math.sqrt(12)
+    ) * 100
+
+    print(f"{annualized_mean_pct = :>.2f}")
+    print(f"{annualized_std_pct = :>.2f}")
+
+    sharpe_ratio = annualized_mean_pct / annualized_std_pct
+
+    print(f"{sharpe_ratio = :>.2f}")
+
+    # total_return_pct = 1.00
+    # for br in backtest_results:
+    #     total_return*= (1+br.portfolio_return)
+
+    # print(f"{total_return = :>.2f}")
+
 
 if __name__ == '__main__':
-    out = backtest_loop(
+    results = backtest_loop(
         start_date = date(year = 2017, month=1, day=1),
         end_date = date(2023, month=1, day=1),
-        strategy=PortfolioStrategy.CONSTANT_CORRELATION
+        strategy=PortfolioStrategy.EQUALLY_WEIGHTED
     )
+
+    summarize_results(results)
+
