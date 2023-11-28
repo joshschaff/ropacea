@@ -73,8 +73,19 @@ def calculate_portfolio(mark_date: date, strategy: PortfolioStrategy) -> Portfol
 
 
 def _value_weighted_portfolio(mark_date) -> Portfolio:
-    # TODO
-    pass
+
+    # get data for the last month
+    last_month = get_in_sample_data(mark_date, sample_months=1)
+
+    # get a mapping from ticker to market cap
+    # group by is to sort in alphabetical order
+    market_caps = last_month.groupby('Ticker')['Monthly Market Capitalization'].mean()
+
+    total_market_cap = sum(market_caps)
+    holdings = (market_caps / total_market_cap).tolist()
+
+    return Portfolio(holdings)
+
 
 def _equally_weighted_portfolio() -> Portfolio:
     N = len(UNIVERSE)
@@ -109,6 +120,9 @@ def _min_risk_model(expected_returns: np.ndarray,
 
     # minimum return constraint
     model.addConstr(expected_returns.T @ holdings >= min_return)
+
+    # diversification constraint
+    model.addConstrs( holdings[i] <= 0.05 for i in range(n_assets) )
 
     model.optimize()
 
