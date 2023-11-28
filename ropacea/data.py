@@ -8,6 +8,7 @@ Also defines the universe of tickers we are using for the rest of analysis.
 import os
 import pandas as pd
 from pathlib import Path
+from functools import lru_cache
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
@@ -51,6 +52,8 @@ UNIVERSE= [
 ]
 
 
+
+@lru_cache(maxsize=None)
 def read_monthly_return_capitalization() -> pd.DataFrame:
     """
     Returns monthly-return-capitalization filtered to the stock universe.
@@ -67,6 +70,14 @@ def read_monthly_return_capitalization() -> pd.DataFrame:
 
     return mrc
 
+
+@lru_cache(maxsize=None)
+def read_risk_free() -> pd.DataFrame:
+
+    rf = pd.read_csv(DATA_DIR / "risk-free.csv", parse_dates=[0])
+
+    return rf
+    
 
 def subset_monthly_return_capitalization(start_date: date, end_date: date):
     """ Obtain a subset of monthly return capitalization from start_date (inclusive) to end_date (exclusive)
@@ -116,6 +127,23 @@ def get_in_sample_data(mark_date: date, sample_months: int = 60) ->  pd.DataFram
                   f"for {ticker:4} at {mark_date}")
 
     return mrc
+
+
+def get_risk_free_rate(mark_date: date) -> float:
+    """
+    Get the risk free rate of the month of given mark_date
+    """
+
+    rf = read_risk_free()
+    start_of_month = mark_date.replace(day=1)
+    start_of_next_month = start_of_month + relativedelta(months=1) 
+    # subset to month of mark_dt
+    rf = rf[rf['Calendar Date'] < pd.to_datetime(start_of_next_month)]
+    rf = rf[rf['Calendar Date'] >= pd.to_datetime(start_of_month)]
+    
+    # return monthly treasury bill return
+    return rf['30 Day Bill Returns'].values[0]
+
 
 
 def get_market_returns(start_date, end_date):

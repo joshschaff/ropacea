@@ -5,7 +5,7 @@ import statistics
 import math
 
 from ropacea.portfolios import Portfolio, PortfolioStrategy, calculate_portfolio
-from ropacea.data import get_market_returns
+from ropacea.data import get_market_returns, get_risk_free_rate
 
 
 BASIS_POINT = 0.0001
@@ -15,7 +15,7 @@ class BacktestResult():
     mark_date: date
     portfolio: Portfolio
     market_returns: list[float]
-    portfolio_return: float
+    excess_return: float
 
 
 def backtest(mark_date: date,
@@ -26,13 +26,18 @@ def backtest(mark_date: date,
     market_returns = get_market_returns(mark_date, mark_date+frequency)
 
     monthly_portfolio_return = portfolio.calc_portfolio_return(market_returns)
-    print(f"{monthly_portfolio_return = }")
+    print(f"{monthly_portfolio_return = :.4f}")
+
+    risk_free_return = get_risk_free_rate(mark_date)
+    print(f"{risk_free_return = :.4f}")
+
+    excess_return = monthly_portfolio_return - risk_free_return
 
     return BacktestResult(
         mark_date,
         portfolio,
         market_returns,
-        monthly_portfolio_return
+        excess_return
     )
 
 
@@ -60,11 +65,11 @@ def summarize_results(backtest_results: list[BacktestResult]):
 
     # monhtly returns (bp)
     monthly_returns_bp_mean = sum([
-      br.portfolio_return/BASIS_POINT for br in backtest_results  
+      br.excess_return/BASIS_POINT for br in backtest_results  
     ]) / len(backtest_results)
 
     monthly_returns_bp_std = statistics.stdev([
-      br.portfolio_return/BASIS_POINT for br in backtest_results  
+      br.excess_return/BASIS_POINT for br in backtest_results  
     ])
 
     print(f"{monthly_returns_bp_mean = :>.2f}")
@@ -97,7 +102,7 @@ if __name__ == '__main__':
     results = backtest_loop(
         start_date = date(year = 2017, month=1, day=1),
         end_date = date(2023, month=1, day=1),
-        strategy=PortfolioStrategy.EQUALLY_WEIGHTED
+        strategy=PortfolioStrategy.VALUE_WEGHTED
     )
 
     summarize_results(results)
