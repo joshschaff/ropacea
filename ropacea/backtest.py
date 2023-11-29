@@ -31,7 +31,7 @@ def backtest(mark_date: date,
     risk_free_return = get_risk_free_rate(mark_date)
     print(f"{risk_free_return = :.4f}")
 
-    excess_return = risk_free_return #monthly_portfolio_return #- risk_free_return
+    excess_return = monthly_portfolio_return - risk_free_return
 
     return BacktestResult(
         mark_date,
@@ -66,7 +66,7 @@ def summarize_results(backtest_results: list[BacktestResult]):
     # monhtly returns (bp)
     monthly_returns_bp_mean = statistics.mean([
       br.excess_return/BASIS_POINT for br in backtest_results  
-    ]) #/ len(backtest_results)
+    ])
 
     monthly_returns_bp_std = statistics.stdev([
       br.excess_return/BASIS_POINT for br in backtest_results  
