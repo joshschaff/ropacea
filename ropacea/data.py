@@ -142,7 +142,7 @@ def get_risk_free_rate(mark_date: date) -> float:
     rf = rf[rf['Calendar Date'] >= pd.to_datetime(start_of_month)]
     
     # return monthly treasury bill return
-    return rf['30 Day Bill Returns'].values[0]
+    return rf['10 Year Bond Returns'].values[0]
 
 
 
@@ -168,5 +168,6 @@ if __name__ == '__main__':
     mark_date = date(year = 2017, month=1, day=1)
     sample_months = 60
     out = get_in_sample_data(mark_date, sample_months)
+    risk=get_risk_free_rate(mark_date)
 
-    print(out)
+    print(risk)

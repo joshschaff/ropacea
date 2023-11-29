@@ -122,7 +122,7 @@ def _min_risk_model(expected_returns: np.ndarray,
     model.addConstr(expected_returns.T @ holdings >= min_return)
 
     # diversification constraint
-    model.addConstrs( holdings[i] <= 0.05 for i in range(n_assets) )
+    model.addConstrs( holdings[i] >= 0.0 for i in range(n_assets) )
 
     model.optimize()
 
@@ -153,7 +153,7 @@ def _min_risk_portfolio(mark_date: date,
             covariance = scs(data)
 
     # TODO: is this a good min_return?
-    min_return = expected_returns.mean()
+    min_return = 0 # expected_returns.mean()
     holdings = _min_risk_model(expected_returns, covariance, min_return)
 
     return Portfolio(holdings)
