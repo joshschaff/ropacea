@@ -18,11 +18,21 @@ class BacktestResult():
     excess_return: float
 
 
+@dataclass 
+class BacktestSummary():
+    monthly_returns_bp_mean: float
+    monthly_returns_bp_std: float
+    annualized_mean_pct: float
+    annualized_std_pct: float
+    sharpe_ratio: float
+
+
 def backtest(mark_date: date,
              strategy: PortfolioStrategy,
-             frequency: relativedelta) -> BacktestResult:
+             frequency: relativedelta,
+             min_return_ratio: float) -> BacktestResult:
 
-    portfolio = calculate_portfolio(mark_date, strategy)
+    portfolio = calculate_portfolio(mark_date, strategy, min_return_ratio)
     market_returns = get_market_returns(mark_date, mark_date+frequency)
 
     monthly_portfolio_return = portfolio.calc_portfolio_return(market_returns)
@@ -44,14 +54,15 @@ def backtest(mark_date: date,
 def backtest_loop(start_date: date, 
                   end_date: date, 
                   strategy: PortfolioStrategy,
-                  frequency = relativedelta(months=1)) -> list[BacktestResult]:
+                  frequency = relativedelta(months=1),
+                  min_return_ratio: float =1) -> list[BacktestResult]:
 
     mark_date = start_date
     backtest_results = []
 
     while (mark_date < end_date):
         print(f"{mark_date = }")
-        backtest_result = backtest(mark_date, strategy, frequency)
+        backtest_result = backtest(mark_date, strategy, frequency, min_return_ratio)
         backtest_results.append(backtest_result)
 
         mark_date = mark_date + frequency
@@ -59,7 +70,7 @@ def backtest_loop(start_date: date,
     return backtest_results
 
 
-def summarize_results(backtest_results: list[BacktestResult]):
+def summarize_results(backtest_results: list[BacktestResult]) -> BacktestSummary:
 
     print(f"{'='*10} SUMMARY {'='*10}")
 
@@ -91,18 +102,25 @@ def summarize_results(backtest_results: list[BacktestResult]):
 
     print(f"{sharpe_ratio = :>.2f}")
 
-    # total_return_pct = 1.00
-    # for br in backtest_results:
-    #     total_return*= (1+br.portfolio_return)
+    out =  BacktestSummary(
+        monthly_returns_bp_mean,
+        monthly_returns_bp_std,
+        annualized_mean_pct,
+        annualized_std_pct,
+        sharpe_ratio
+    )
 
-    # print(f"{total_return = :>.2f}")
+    return out
+
+
 
 
 if __name__ == '__main__':
     results = backtest_loop(
         start_date = date(year = 2017, month=1, day=1),
         end_date = date(2023, month=1, day=1),
-        strategy=PortfolioStrategy.EQUALLY_WEIGHTED
+        strategy=PortfolioStrategy.EQUALLY_WEIGHTED,
+        min_return_ratio=1.75
     )
 
     summarize_results(results)
