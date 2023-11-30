@@ -5,9 +5,11 @@ dependencies = [
     'pandas',
     'openpyxl',
     'python-dateutil',
-    'gurobipy',
+    'gurobipy==10.0.3',
     'numpy',
-    'statsmodels'
+    'statsmodels',
+    'plotly',
+    'nbformat'
 ]
 description = "Risk-Optimized Portfolios: An Analysis of Covariance Estimation Approaches"
 
