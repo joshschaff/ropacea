@@ -36,7 +36,7 @@ class Portfolio:
 
 class PortfolioStrategy(Enum):
     # two benchmark strategies
-    VALUE_WEGHTED = 0
+    VALUE_WEIGHTED = 0
     EQUALLY_WEIGHTED = 1
     # three min risk strategies
     SINGLE_FACTOR = 2
@@ -44,7 +44,7 @@ class PortfolioStrategy(Enum):
     SAMPLE_COVARIANCE = 4
 
 
-def calculate_portfolio(mark_date: date, strategy: PortfolioStrategy, min_return_ratio: float = 1.0) -> Portfolio:
+def calculate_portfolio(mark_date: date, strategy: PortfolioStrategy, min_return_ratio: float) -> Portfolio:
     """
     Calculate a portfolio on the given mark_date and using the given strategy.
 
@@ -58,14 +58,14 @@ def calculate_portfolio(mark_date: date, strategy: PortfolioStrategy, min_return
     portfolio = None
 
     match strategy:
-        case PortfolioStrategy.VALUE_WEGHTED:
+        case PortfolioStrategy.VALUE_WEIGHTED:
             portfolio = _value_weighted_portfolio(mark_date)
         case PortfolioStrategy.EQUALLY_WEIGHTED:
             portfolio = _equally_weighted_portfolio()
         case PortfolioStrategy.CONSTANT_CORRELATION | \
              PortfolioStrategy.SINGLE_FACTOR | \
              PortfolioStrategy.SAMPLE_COVARIANCE:
-            portfolio = _min_risk_portfolio(mark_date, strategy, min_return_ratio)
+            portfolio = _min_risk_portfolio(mark_date, strategy)
         case _:
             raise ValueError("Invalid PortfolioStrategy specified")
 
@@ -122,7 +122,7 @@ def _min_risk_model(expected_returns: np.ndarray,
     model.addConstr(expected_returns.T @ holdings >= min_return)
 
     # diversification constraint
-    model.addConstrs( holdings[i] <= 0.5 for i in range(n_assets) )
+    #model.addConstrs( holdings[i] >= 0.0 for i in range(n_assets) )
 
     model.optimize()
 
@@ -130,8 +130,7 @@ def _min_risk_model(expected_returns: np.ndarray,
 
 
 def _min_risk_portfolio(mark_date: date, 
-                       strategy: PortfolioStrategy,
-                       min_return_ratio: float = 1.0) -> Portfolio:
+                       strategy: PortfolioStrategy) -> Portfolio:
     """Calculate a portfolio using the min risk model and 
     one of the three covariance estimation strategies"""
 
@@ -154,7 +153,7 @@ def _min_risk_portfolio(mark_date: date,
             covariance = scs(data)
 
     # TODO: is this a good min_return?
-    min_return = min_return_ratio* expected_returns.mean()
+    min_return = 0 # expected_returns.mean()
     holdings = _min_risk_model(expected_returns, covariance, min_return)
 
     return Portfolio(holdings)
