@@ -65,7 +65,7 @@ def calculate_portfolio(mark_date: date, strategy: PortfolioStrategy, min_return
         case PortfolioStrategy.CONSTANT_CORRELATION | \
              PortfolioStrategy.SINGLE_FACTOR | \
              PortfolioStrategy.SAMPLE_COVARIANCE:
-            portfolio = _min_risk_portfolio(mark_date, strategy)
+            portfolio = _min_risk_portfolio(mark_date, strategy, min_return_ratio)
         case _:
             raise ValueError("Invalid PortfolioStrategy specified")
 
@@ -130,7 +130,8 @@ def _min_risk_model(expected_returns: np.ndarray,
 
 
 def _min_risk_portfolio(mark_date: date, 
-                       strategy: PortfolioStrategy) -> Portfolio:
+                       strategy: PortfolioStrategy,
+                       min_return_ratio: float) -> Portfolio:
     """Calculate a portfolio using the min risk model and 
     one of the three covariance estimation strategies"""
 
@@ -153,7 +154,7 @@ def _min_risk_portfolio(mark_date: date,
             covariance = scs(data)
 
     # TODO: is this a good min_return?
-    min_return = 0 # expected_returns.mean()
+    min_return = expected_returns.mean() * min_return_ratio
     holdings = _min_risk_model(expected_returns, covariance, min_return)
 
     return Portfolio(holdings)
